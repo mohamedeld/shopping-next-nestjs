@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -24,8 +25,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "../ui/toast";
 import Link from "next/link";
 import { LoginSchema, loginSchema } from "@/schema/auth-schema";
+import { createUserAction } from "@/server/create-user-action";
 
 export function SignUpForm() {
+  const router = useRouter();
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,8 +37,30 @@ export function SignUpForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof loginSchema>) {}
+  async function onSubmit(data: z.infer<typeof loginSchema>) {
+    try {
+      const response = await createUserAction(data);
 
+      if (response?.error) {
+        toast.add({
+          title: "Error",
+          description: response.error,
+        });
+      } else {
+        toast.add({
+          title: "Success",
+          description: "User created successfully",
+        });
+        router.push("/");
+      }
+    } catch (error) {
+      toast.add({
+        title: "Error",
+        description: (error as Error).message,
+      });
+    }
+  }
+  const isLoading = form.formState.isSubmitting;
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader>
@@ -93,8 +118,8 @@ export function SignUpForm() {
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal">
-          <Button type="submit" form="form-rhf-demo">
-            Submit
+          <Button type="submit" form="form-rhf-demo" disabled={isLoading}>
+            {isLoading ? "Submitting..." : "Submit"}
           </Button>
         </Field>
         <div className="flex items-center gap-1">
