@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from '../../generated/prisma/client';
+import { Prisma, User } from '../../generated/prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -25,5 +25,10 @@ export class UsersService {
       },
     });
     return user;
+  }
+  async getUser(filter: Prisma.UserWhereUniqueInput) {
+    return this.prismaService.user.findUniqueOrThrow({
+      where: filter,
+    });
   }
 }
