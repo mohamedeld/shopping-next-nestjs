@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -24,8 +25,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "../ui/toast";
 import { LoginSchema, loginSchema } from "@/schema/auth-schema";
 import Link from "next/link";
+import { loginUserAction } from "@/server/login-user-action";
 
 export function LoginForm() {
+  const router = useRouter();
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,7 +37,29 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof loginSchema>) {}
+  async function onSubmit(data: z.infer<typeof loginSchema>) {
+    try {
+      const response = await loginUserAction(data);
+
+      if (response?.error) {
+        toast.add({
+          title: "Error",
+          description: response.error,
+        });
+      } else {
+        toast.add({
+          title: "Success",
+          description: "Login Successfully",
+        });
+        router.push("/");
+      }
+    } catch (error) {
+      toast.add({
+        title: "Error",
+        description: (error as Error).message,
+      });
+    }
+  }
 
   return (
     <Card className="w-full sm:max-w-md">
