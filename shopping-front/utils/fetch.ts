@@ -2,19 +2,22 @@
 
 import { cookies } from "next/headers";
 
-const getHeaders = async () => ({
-  Cookie: (await cookies())?.toString(),
-  "Content-Type": "application/json",
-});
+const getHeaders = async () => {
+  const cookieStore = await cookies();
+  const cookie = cookieStore.toString();
+
+  return {
+    ...(cookie && { Cookie: cookie }),
+    "Content-Type": "application/json",
+  };
+};
 export const post = async <TBody>(
   path: string,
   body: TBody,
 ): Promise<Response> => {
   const response = await fetch(path, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: await getHeaders(),
     body: JSON.stringify(body),
   });
 

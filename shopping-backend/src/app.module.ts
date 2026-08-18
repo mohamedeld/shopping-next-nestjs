@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { envSchema } from './common/configration/environment.schema';
+import { ProductsModule } from './products/products.module';
 import configMapping from './common/configration/config-map';
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import configMapping from './common/configration/config-map';
     UsersModule,
     PrismaModule,
     AuthModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
