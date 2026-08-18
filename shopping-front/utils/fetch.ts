@@ -3,29 +3,33 @@
 import { cookies } from "next/headers";
 
 const getHeaders = async () => {
-  const cookieStore = await cookies();
-  const cookie = cookieStore.toString();
+  const cookie = (await cookies()).toString();
 
   return {
-    ...(cookie && { Cookie: cookie }),
     "Content-Type": "application/json",
+    ...(cookie ? { Cookie: cookie } : {}),
   };
 };
-export const post = async <TBody>(
-  path: string,
-  body: TBody,
-): Promise<Response> => {
+
+export const post = async <TBody>(path: string, body: TBody) => {
   const response = await fetch(path, {
     method: "POST",
     headers: await getHeaders(),
     body: JSON.stringify(body),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+    throw new Error(
+      data?.message || `Request failed with status ${response.status}`,
+    );
   }
 
-  return response;
+  return {
+    success: true,
+    data,
+  };
 };
 
 export const get = async (path: string): Promise<Response> => {

@@ -41,7 +41,7 @@ export function SignUpForm() {
     try {
       const response = await createUserAction(data);
 
-      if (response?.error) {
+      if (!response?.success) {
         toast.add({
           title: "Error",
           description: response.error,

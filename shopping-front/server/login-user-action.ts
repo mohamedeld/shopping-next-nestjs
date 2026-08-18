@@ -9,9 +9,9 @@ import { jwtDecode } from "jwt-decode";
 export const loginUserAction = async (userData: LoginSchema) => {
   const response = await post(`${Constants.API_URL}/auth/login`, userData);
 
-  await setAuthCookie(response);
+  await setAuthCookie(response?.data);
 
-  return response.json();
+  return response?.data.json();
 };
 
 const setAuthCookie = async (res: Response) => {

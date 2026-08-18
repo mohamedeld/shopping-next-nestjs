@@ -31,9 +31,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "../ui/toast";
 import { createProductAction } from "@/server/create-product-action";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 
 export function CreateProductDialog() {
+  const [open, setOpen] = useState(false);
   const router = useRouter();
+
   const form = useForm<CreateProductSchema>({
     resolver: zodResolver(createProductSchema),
     defaultValues: {
@@ -47,7 +50,7 @@ export function CreateProductDialog() {
     try {
       const response = await createProductAction(data);
 
-      if (response?.error) {
+      if (!response?.success) {
         toast.add({
           title: "Error",
           description: response.error,
@@ -58,6 +61,7 @@ export function CreateProductDialog() {
           description: "Product created successfully",
         });
         router.refresh();
+        setOpen(false);
         form.reset();
       }
     } catch (error) {
@@ -68,7 +72,7 @@ export function CreateProductDialog() {
     }
   }
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-8 h-8 rounded-full">
           <Plus className="size-5 " />
