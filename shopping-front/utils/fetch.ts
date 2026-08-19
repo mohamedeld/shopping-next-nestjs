@@ -29,6 +29,7 @@ export const post = async <TBody>(path: string, body: TBody) => {
   return {
     success: true,
     data,
+    response,
   };
 };
 
